@@ -38,7 +38,7 @@ function initMetrix(MetrixAnalytics) {
         EUR: "EUR"
     };
 
-    const SDK_VERSION_NAME = "0.8.0";
+    const SDK_VERSION_NAME = "0.9.0";
 
     let MetrixAppId = null;
     let documentReferrer = null;
@@ -214,7 +214,7 @@ function initMetrix(MetrixAnalytics) {
     let clientId = {};
 
     clientId.setMetrixId = function (value) {
-        localStorage.setItem(localStorageKeys.metrixId, value);
+        Utils.persistItem(localStorageKeys.metrixId, value);
     };
 
     clientId.getMetrixId = function () {
@@ -264,7 +264,7 @@ function initMetrix(MetrixAnalytics) {
     };
 
     metrixQueue.setMainQueue = function (newQueue) {
-        localStorage.setItem(localStorageKeys.mainQueue, JSON.stringify(newQueue));
+        Utils.persistItem(localStorageKeys.mainQueue, JSON.stringify(newQueue));
     };
 
     metrixQueue.getSendingQueue = function () {
@@ -272,7 +272,7 @@ function initMetrix(MetrixAnalytics) {
     };
 
     metrixQueue.setSendingQueue = function (newQueue) {
-        localStorage.setItem(localStorageKeys.sendingQueue, JSON.stringify(newQueue));
+        Utils.persistItem(localStorageKeys.sendingQueue, JSON.stringify(newQueue));
     };
 
     metrixQueue.getLastDataSendTime = function () {
@@ -284,7 +284,7 @@ function initMetrix(MetrixAnalytics) {
     };
 
     metrixQueue.setLastDataSendTime = function (time) {
-        localStorage.setItem(localStorageKeys.lastDataSendTime, time);
+        Utils.persistItem(localStorageKeys.lastDataSendTime, time);
     };
 
     metrixQueue.getLastDataSendTryTime = function () {
@@ -296,7 +296,7 @@ function initMetrix(MetrixAnalytics) {
     };
 
     metrixQueue.setLastDataSendTryTime = function () {
-        localStorage.setItem(localStorageKeys.lastDataSendTryTime, Utils.getCurrentTime().toString());
+        Utils.persistItem(localStorageKeys.lastDataSendTryTime, Utils.getCurrentTime().toString());
     };
 
     metrixQueue.breakHeavyQueue = function () {
@@ -339,7 +339,7 @@ function initMetrix(MetrixAnalytics) {
     metrixQueue.removeSendingState = function () {
         localStorage.removeItem(localStorageKeys.sendingQueue);
         currentTabAjaxState = ajaxState.STOP;
-        localStorage.setItem(localStorageKeys.ajaxState, ajaxState.STOP);
+        Utils.persistItem(localStorageKeys.ajaxState, ajaxState.STOP);
     };
 
     // Three factors are considered:
@@ -414,7 +414,7 @@ function initMetrix(MetrixAnalytics) {
             if (numberOfTries < 3) {
                 numberOfTries += 1;
 
-                localStorage.setItem(localStorage.ajaxState, ajaxState.START);
+                Utils.persistItem(localStorage.ajaxState, ajaxState.START);
                 currentTabAjaxState = ajaxState.START;
 
                 metrixQueue.updateSendingQueue();
@@ -588,7 +588,7 @@ function initMetrix(MetrixAnalytics) {
     };
 
     metrixSession.updateLastVisitTime = function () {
-        localStorage.setItem(localStorageKeys.lastVisitTime, Utils.getCurrentTime().toString());
+        Utils.persistItem(localStorageKeys.lastVisitTime, Utils.getCurrentTime().toString());
     };
 
     metrixSession.getLastVisitTime = function () {
@@ -596,7 +596,7 @@ function initMetrix(MetrixAnalytics) {
     };
 
     metrixSession.resetSessionDuration = function () {
-        localStorage.setItem(localStorageKeys.sessionDuration, "0");
+        Utils.persistItem(localStorageKeys.sessionDuration, "0");
         this.updateLastVisitTime();
     };
 
@@ -608,7 +608,7 @@ function initMetrix(MetrixAnalytics) {
         let addedTime = Utils.getCurrentTime() - this.getLastVisitTime();
         let newDuration = this.getSessionDuration() + addedTime;
 
-        localStorage.setItem(localStorageKeys.sessionDuration, newDuration.toString());
+        Utils.persistItem(localStorageKeys.sessionDuration, newDuration.toString());
     };
 
     metrixSession.getSessionIdLastReadTime = function () {
@@ -618,7 +618,7 @@ function initMetrix(MetrixAnalytics) {
     };
 
     metrixSession.setSessionIdLastReadTime = function () {
-        localStorage.setItem(localStorageKeys.sessionIdLastReadTime, Utils.getCurrentTime().toString());
+        Utils.persistItem(localStorageKeys.sessionIdLastReadTime, Utils.getCurrentTime().toString());
     };
 
     metrixSession.sessionIdHasBeenRead = function () {
@@ -631,7 +631,7 @@ function initMetrix(MetrixAnalytics) {
 
     metrixSession.renewSessionId = function () {
         let newSessionId = Utils.genGuid();
-        localStorage.setItem(localStorageKeys.sessionId, newSessionId);
+        Utils.persistItem(localStorageKeys.sessionId, newSessionId);
     };
 
     metrixSession.getSessionNumber = function () {
@@ -645,9 +645,9 @@ function initMetrix(MetrixAnalytics) {
         if (this.sessionIdHasBeenRead()) {
             let count = this.getSessionNumber();
             count += 1;
-            localStorage.setItem(localStorageKeys.sessionNumber, count.toString());
+            Utils.persistItem(localStorageKeys.sessionNumber, count.toString());
         } else {
-            localStorage.setItem(localStorageKeys.sessionNumber, '0');
+            Utils.persistItem(localStorageKeys.sessionNumber, '0');
         }
     };
 
@@ -656,7 +656,7 @@ function initMetrix(MetrixAnalytics) {
     };
 
     metrixSession.setDocumentReferrer = function () {
-        localStorage.setItem(localStorageKeys.referrerPath, document.referrer);
+        Utils.persistItem(localStorageKeys.referrerPath, document.referrer);
     };
 
     metrixSession.referrerHasNotChanged = function () {
@@ -1081,6 +1081,12 @@ function initMetrix(MetrixAnalytics) {
 
     Utils.isNumber = function (param) {
         return typeof param === 'number'
+    };
+
+    Utils.persistItem = function (key, value) {
+        try {
+            localStorage.setItem(key, value);
+        } catch(e) {}
     };
 
     let metrixLogger = {};
