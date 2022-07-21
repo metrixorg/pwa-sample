@@ -38,7 +38,7 @@ function initMetrix(MetrixAnalytics) {
         EUR: "EUR"
     };
 
-    const SDK_VERSION_NAME = "0.9.0";
+    const SDK_VERSION_NAME = "0.10.0";
 
     let MetrixAppId = null;
     let documentReferrer = null;
@@ -47,6 +47,7 @@ function initMetrix(MetrixAnalytics) {
     let storeName = null;
     let trackerToken = null;
     let referrer = null;
+    let installBeginTime = null;
     let numberOfTries = 0;
     let locationPathName = document.location.pathname;
     let currentTabAjaxState = ajaxState.UNUSED;
@@ -130,7 +131,8 @@ function initMetrix(MetrixAnalytics) {
 
         storeName = options.storeName;
         trackerToken = options.trackerToken;
-        referrer = Utils.getQueryString(document.location.search);
+        referrer = options.referrer || Utils.getQueryString(document.location.search);
+        installBeginTime = options.ibt;
 
         if (options.disableLogs) {
             logEnabled = false
@@ -141,7 +143,8 @@ function initMetrix(MetrixAnalytics) {
             "uniqueDeviceId": uniqueDeviceId,
             "trackerToken": trackerToken,
             "storeName": storeName,
-            "referrer": referrer
+            "referrer": referrer,
+            "ibt": installBeginTime
         });
 
         Utils.onDomLoaded(function () {
@@ -449,7 +452,8 @@ function initMetrix(MetrixAnalytics) {
         }
         meta.referrer = {
             "available": true,
-            "referrer": referrer
+            "referrer": referrer,
+            "ibt": installBeginTime
         }
         meta.location = {}
 
